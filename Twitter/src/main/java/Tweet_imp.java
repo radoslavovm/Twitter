@@ -8,8 +8,9 @@ import java.util.Random;
  */
 public class Tweet_imp {
 
-    //    private static TweetDbAPI api = new TweetDbSQL();
-    private static TweetDbAPI api = new strategy1();
+    //private static TweetDbAPI api = new TweetDbSQL();
+    //private static TweetDbAPI api = new strategy1();
+    private static TweetDbAPI api = new strategy2();
 
     public static void main(String[] args) {
 //        //Authenticate your access to the server.
@@ -17,6 +18,8 @@ public class Tweet_imp {
 //        String user = "root";
 //        String password = "Mir82605131!";
 //        api.authenticate(url, user, password); // DON'T HARDCODE PASSWORDS!
+
+        api.flush();
 
         //insert users
         try {
@@ -28,6 +31,7 @@ public class Tweet_imp {
             String[] users;
 
             //Parsing a CSV file into BufferedReader class constructor
+            //BufferedReader br = new BufferedReader(new FileReader("../users.csv"));
             BufferedReader br = new BufferedReader(new FileReader("users_test.csv"));
             br.readLine(); // this will read the first line
 
@@ -56,6 +60,7 @@ public class Tweet_imp {
             String[] tweet;
 
             //parsing a CSV file into BufferedReader class constructor
+            //BufferedReader br = new BufferedReader(new FileReader("../tweets.csv"));
             BufferedReader br = new BufferedReader(new FileReader("tweets_test.csv"));
             br.readLine(); // this will read the first line
             //int tweet_id = 1;
@@ -66,7 +71,6 @@ public class Tweet_imp {
                 String tweet_text = tweet[0];
                 int user_id = Integer.parseInt(tweet[1]);
                 api.insert_tweet(tweet_text, user_id);
-                //tweet_id ++;
             }
             long endTime = System.nanoTime();
             // get difference of two nanoTime values
@@ -83,6 +87,7 @@ public class Tweet_imp {
             Random r = new Random();
             int user_id;
 ////////////////////////////////////////////////////////////////////////CHANGE BACK TO 100///
+////////////////////////////////////////////////////////////////////////CHANGE user_id///
             for (int i=0; i < 1; i++){
                 user_id = 3;
                 //user_id =  (r.nextInt(99999) + 1);

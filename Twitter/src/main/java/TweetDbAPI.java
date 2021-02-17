@@ -8,12 +8,7 @@ public interface TweetDbAPI {
 //     */
     // void authenticate(String url, String user, String password);
 
-    /**
-     * Insert a tweet
-     * @param tweet_text
-     * @param user_id
-     */
-    void insert_tweet(String tweet_text, int user_id);
+    void flush();
 
     /**
      * Insert a user
@@ -23,12 +18,17 @@ public interface TweetDbAPI {
     void insert_user(int user_id, int follower_id);
 
     /**
+     * Insert a tweet
+     * @param tweet_text
+     * @param user_id
+     */
+    void insert_tweet(String tweet_text, int user_id);
+
+    /**
      * make a homescreen
      * @param user_id
      */
     void home_screen(int user_id);
-
-    void flush();
 
 //    /**
 //     * Close the connection when application finishes
