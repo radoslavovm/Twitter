@@ -8,7 +8,7 @@ import java.util.Random;
  */
 public class Tweet_imp {
 
-//    private static TweetDbAPI api = new TweetDbSQL();
+    //    private static TweetDbAPI api = new TweetDbSQL();
     private static TweetDbAPI api = new strategy1();
 
     public static void main(String[] args) {
@@ -28,7 +28,7 @@ public class Tweet_imp {
             String[] users;
 
             //Parsing a CSV file into BufferedReader class constructor
-            BufferedReader br = new BufferedReader(new FileReader("users.csv"));
+            BufferedReader br = new BufferedReader(new FileReader("users_test.csv"));
             br.readLine(); // this will read the first line
 
             while ((line = br.readLine()) != null)
@@ -45,7 +45,7 @@ public class Tweet_imp {
             System.out.println("Execution time of Insert User in milliseconds : " +
                     timeElapsed / 1000000);
         }  catch (Exception e) {
-                e.printStackTrace();
+            e.printStackTrace();
         }
         //insert tweets
         try {
@@ -56,17 +56,17 @@ public class Tweet_imp {
             String[] tweet;
 
             //parsing a CSV file into BufferedReader class constructor
-            BufferedReader br = new BufferedReader(new FileReader("tweets.csv"));
+            BufferedReader br = new BufferedReader(new FileReader("tweets_test.csv"));
             br.readLine(); // this will read the first line
-            int tweet_id = 1;
+            //int tweet_id = 1;
 
             while ((line = br.readLine()) != null) //returns a Boolean value
             {
                 tweet = line.split(splitBy); // use comma as separator
                 String tweet_text = tweet[0];
                 int user_id = Integer.parseInt(tweet[1]);
-                api.insert_tweet(tweet_id, tweet_text, user_id);
-                tweet_id ++;
+                api.insert_tweet(tweet_text, user_id);
+                //tweet_id ++;
             }
             long endTime = System.nanoTime();
             // get difference of two nanoTime values
@@ -82,7 +82,8 @@ public class Tweet_imp {
             long startTime = System.nanoTime();
             Random r = new Random();
             int user_id;
-            for (int i=0; i < 100; i++){
+////////////////////////////////////////////////////////////////////////CHANGE BACK TO 100///
+            for (int i=0; i < 1; i++){
                 user_id = 3;
                 //user_id =  (r.nextInt(99999) + 1);
                 api.home_screen(user_id);

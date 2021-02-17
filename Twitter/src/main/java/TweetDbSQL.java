@@ -14,7 +14,7 @@ public class TweetDbSQL implements TweetDbAPI {
     /**
      * insert a tweet into db
      */
-    public void insert_tweet(int tweet_id, String tweet_text, int user_id) {
+    public void insert_tweet(String tweet_text, int user_id) {
         Date date= new Date();
         long time = date.getTime();
         Timestamp ts = new Timestamp(time);
@@ -25,10 +25,10 @@ public class TweetDbSQL implements TweetDbAPI {
             Connection con = dbu.getConnection(); // get the active connection
             Statement stmt = con.createStatement();
 
-                sql = "INSERT INTO Twitter.tweet (tweet_text,user_id,tweet_ts) VALUES" +
-                        "('"+tweet_text+"','"+user_id+"','"+ts+"')";
+            sql = "INSERT INTO Twitter.tweet (tweet_text,user_id,tweet_ts) VALUES" +
+                    "('"+tweet_text+"','"+user_id+"','"+ts+"')";
 
-                stmt.executeUpdate(sql);
+            stmt.executeUpdate(sql);
             // Cleanup
             stmt.close();
 
@@ -48,9 +48,9 @@ public class TweetDbSQL implements TweetDbAPI {
             Statement stmt = con.createStatement();
             String sql;
 
-                sql = "INSERT INTO Twitter.followers (user_id,follows_id) VALUES" +
-                        "('"+user_id+"','"+follower_id+"')";
-                stmt.executeUpdate(sql);
+            sql = "INSERT INTO Twitter.followers (user_id,follows_id) VALUES" +
+                    "('"+user_id+"','"+follower_id+"')";
+            stmt.executeUpdate(sql);
             // Cleanup
             stmt.close();
 
