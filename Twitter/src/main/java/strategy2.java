@@ -24,7 +24,6 @@ public class strategy2 implements TweetDbAPI {
 
     @Override
     public void insert_tweet(String tweet_text, int user_id) {
-
         // key tweet:id val user:id
         // for this tweet , loop through list of people that follow user , call home_screen to add tweet to follower
         // key tweet:id val tweet:text
@@ -36,7 +35,5 @@ public class strategy2 implements TweetDbAPI {
         // key user , list tweet ids
         // system out user
         //system out tweets
-
     }
-
 }
