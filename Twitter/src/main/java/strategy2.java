@@ -1,7 +1,11 @@
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 /*
     This is the Broadcasting Strategy. As tweets are inserted, the timelines of users are populated with tweet ids
     The users and their tweet timelines are then printed.
@@ -16,8 +20,6 @@ public class strategy2 implements TweetDbAPI {
         System.out.println("Connection to server sucessfully");
         //check whether server is running or not
         System.out.println("Server is running: " + jedis.ping());
-        // an incrementer to give every tweet_text a tweet_id
-        jedis.set("next_tweet_id", String.valueOf(1));
     }
 
     @Override
@@ -28,12 +30,13 @@ public class strategy2 implements TweetDbAPI {
 
     @Override
     public void insert_tweet(String tweet_text, int user_id) {
-        // key tweet:id val user:id
-        jedis.set("Tweet_id/User:"+ jedis.get("next_tweet_id"), String.valueOf(user_id));
+
+        String tweet_id = UUID.randomUUID().toString();;
+
         // key tweet:id val tweet:text
-        jedis.set("Tweet_id/Text:"+ jedis.get("next_tweet_id"), tweet_text);
+        jedis.set("Tweet_id/Text:"+ tweet_id, tweet_text);
         // key user:id val list of tweet:id the user is author of
-        jedis.lpush("User_id:"+user_id, jedis.get("next_tweet_id"));
+        jedis.lpush("User_id:"+user_id, String.valueOf(tweet_id));
 
         String cur = ScanParams.SCAN_POINTER_START;
         List<String> followers = null;
@@ -42,21 +45,18 @@ public class strategy2 implements TweetDbAPI {
         followers = scanFollowers.getResult();
 
         for (int u=0; u < followers.size(); u++) {
-            jedis.set(followers.get(u), String.valueOf(user_id));
-            home_screen(Integer.parseInt(followers.get(u)));
+            //Create Timeline
+            jedis.lpush("Timeline:"+followers.get(u), tweet_id);
         }
-        jedis.incrBy("next_tweet_id", 1);
     }
 
     @Override
     public void home_screen(int user_id) {
-        String author = jedis.get(String.valueOf(user_id));
-        List<String> tweets = jedis.lrange("User_id:"+author, 0, -1);
-
-        for (int t=0; t < tweets.size(); t++) {
-            jedis.lpush("TimeLine:"+user_id , tweets.get(t));
+        List<String> timeline_id = jedis.lrange("Timeline:"+user_id, 0, 11);
+        List<String> timeline_text = new ArrayList<>();
+        for (int i=0; i < timeline_id.size(); i++) {
+            timeline_text.add(jedis.get("Tweet_id/Text:"+timeline_id.get(i)));
         }
-
-        // system out user author, tweet
+        System.out.println("Timeline:"+user_id+":"+timeline_text);
     }
 }

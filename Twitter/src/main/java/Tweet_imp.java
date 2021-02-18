@@ -31,8 +31,8 @@ public class Tweet_imp {
             String[] users;
 
             //Parsing a CSV file into BufferedReader class constructor
-            //BufferedReader br = new BufferedReader(new FileReader("../users.csv"));
-            BufferedReader br = new BufferedReader(new FileReader("users_test.csv"));
+            BufferedReader br = new BufferedReader(new FileReader("../../users.csv"));
+            //BufferedReader br = new BufferedReader(new FileReader("users_test.csv"));
             br.readLine(); // this will read the first line
 
             while ((line = br.readLine()) != null)
@@ -60,10 +60,9 @@ public class Tweet_imp {
             String[] tweet;
 
             //parsing a CSV file into BufferedReader class constructor
-            //BufferedReader br = new BufferedReader(new FileReader("../tweets.csv"));
-            BufferedReader br = new BufferedReader(new FileReader("tweets_test.csv"));
+            BufferedReader br = new BufferedReader(new FileReader("../../tweets.csv"));
+            //BufferedReader br = new BufferedReader(new FileReader("tweets_test.csv"));
             br.readLine(); // this will read the first line
-            //int tweet_id = 1;
 
             while ((line = br.readLine()) != null) //returns a Boolean value
             {
@@ -88,9 +87,9 @@ public class Tweet_imp {
             int user_id;
 ////////////////////////////////////////////////////////////////////////CHANGE BACK TO 100///
 ////////////////////////////////////////////////////////////////////////CHANGE user_id///
-            for (int i=0; i < 1; i++){
-                user_id = 3;
-                //user_id =  (r.nextInt(99999) + 1);
+            for (int i=0; i < 100; i++){
+                //user_id = 35196;
+                user_id =  (r.nextInt(99999) + 1);
                 api.home_screen(user_id);
             }
             long endTime = System.nanoTime();
