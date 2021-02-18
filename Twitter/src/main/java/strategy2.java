@@ -42,17 +42,19 @@ public class strategy2 implements TweetDbAPI {
         followers = scanFollowers.getResult();
 
         for (int u=0; u < followers.size(); u++) {
-            home_screen(user_id, Integer.parseInt(followers.get(u)));
+            jedis.set(followers.get(u), String.valueOf(user_id));
+            home_screen(Integer.parseInt(followers.get(u)));
         }
         jedis.incrBy("next_tweet_id", 1);
     }
 
     @Override
-    public void home_screen(int user_id, int f) {
-        List<String> tweets = jedis.lrange("User_id:"+user_id, 0, -1);
+    public void home_screen(int user_id) {
+        String author = jedis.get(String.valueOf(user_id));
+        List<String> tweets = jedis.lrange("User_id:"+author, 0, -1);
 
         for (int t=0; t < tweets.size(); t++) {
-            jedis.lpush("TimeLine:"+f , tweets.get(t));
+            jedis.lpush("TimeLine:"+user_id , tweets.get(t));
         }
 
         // system out user author, tweet
