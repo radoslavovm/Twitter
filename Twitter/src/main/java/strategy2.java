@@ -1,8 +1,9 @@
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ import java.util.UUID;
 public class strategy2 implements TweetDbAPI {
     public Jedis jedis = new Jedis("localhost");
 
-    @Override
+    //clear any data already in redis server
     public void flush() {
         jedis.flushAll();
         System.out.println("Connection to server sucessfully");
@@ -30,33 +31,38 @@ public class strategy2 implements TweetDbAPI {
 
     @Override
     public void insert_tweet(String tweet_text, int user_id) {
+        //create uuid for tweets || generated data does not contain tweet_ids
+        String tweet_id = UUID.randomUUID().toString();
+        //create timestamp for tweet as it is inserted
+        String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
 
-        String tweet_id = UUID.randomUUID().toString();;
-
-        // key tweet:id val tweet:text
-        jedis.set("Tweet_id/Text:"+ tweet_id, tweet_text);
-        // key user:id val list of tweet:id the user is author of
+        // A STRING : key tweet:id & value tweet:text
+        jedis.set("Tweet_id:" + tweet_id, tweet_text);
+        // A LIST : key user:id & value list of tweet:id that the user is author of
         jedis.lpush("User_id:"+user_id, String.valueOf(tweet_id));
 
+        // instantiate cursor
         String cur = ScanParams.SCAN_POINTER_START;
         List<String> followers = null;
-        //all the followers that need to have timelines populated
+        //all the followers that need to have timelines populated (all followers that follow user_id)
         ScanResult<String> scanFollowers = jedis.sscan("User:"+ user_id, cur);
         followers = scanFollowers.getResult();
 
         for (int u=0; u < followers.size(); u++) {
-            //Create Timeline
+            //Create/populate Timeline for each follower
             jedis.lpush("Timeline:"+followers.get(u), tweet_id);
         }
     }
 
     @Override
     public void home_screen(int user_id) {
+        // Create list of the first 10 tweet ids in the timeline
         List<String> timeline_id = jedis.lrange("Timeline:"+user_id, 0, 11);
         List<String> timeline_text = new ArrayList<>();
         for (int i=0; i < timeline_id.size(); i++) {
-            timeline_text.add(jedis.get("Tweet_id/Text:"+timeline_id.get(i)));
+            // create list of the tweet text that will be outputted for timeline
+            timeline_text.add(jedis.get("Tweet_id:"+timeline_id.get(i)));
         }
-        System.out.println("Timeline:"+user_id+":"+timeline_text);
+        System.out.println("Timeline for:"+user_id+":"+timeline_text);
     }
 }
