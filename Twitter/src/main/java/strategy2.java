@@ -2,11 +2,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
+import java.util.*;
 /*
     This is the Broadcasting Strategy. As tweets are inserted, the timelines of users are populated with tweet ids
     The users and their tweet timelines are then printed.
@@ -36,10 +32,14 @@ public class strategy2 implements TweetDbAPI {
         //create timestamp for tweet as it is inserted
         String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
 
-        // A STRING : key tweet:id & value tweet:text
-        jedis.set("Tweet_id:" + tweet_id, tweet_text);
+        //A Hash : key is tweet ts, tweet:id & value is a tweet text, timestamp, and author user
+        Map<String, String> tweet = new HashMap<>();
+        tweet.put("Tweet_text", tweet_text);
+        tweet.put("TimeStamp", timeStamp);
+        tweet.put("User:", String.valueOf(user_id));
+        jedis.hmset("Tweet_id:"+tweet_id, tweet);
         // A LIST : key user:id & value list of tweet:id that the user is author of
-        jedis.lpush("User_id:"+user_id, String.valueOf(tweet_id));
+        jedis.lpush("User_id:"+user_id, tweet_id);
 
         // instantiate cursor
         String cur = ScanParams.SCAN_POINTER_START;
@@ -58,10 +58,10 @@ public class strategy2 implements TweetDbAPI {
     public void home_screen(int user_id) {
         // Create list of the first 10 tweet ids in the timeline
         List<String> timeline_id = jedis.lrange("Timeline:"+user_id, 0, 11);
-        List<String> timeline_text = new ArrayList<>();
+        List<List<String>> timeline_text = new ArrayList<>();
         for (int i=0; i < timeline_id.size(); i++) {
             // create list of the tweet text that will be outputted for timeline
-            timeline_text.add(jedis.get("Tweet_id:"+timeline_id.get(i)));
+            timeline_text.add(jedis.hmget("Tweet_id:"+timeline_id.get(i), "Tweet_text", "TimeStamp", "User:"));
         }
         System.out.println("Timeline for:"+user_id+":"+timeline_text);
     }

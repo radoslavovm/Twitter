@@ -2,9 +2,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.UUID;
-import java.util.Date;
+import java.util.*;
 
 public class strategy1 implements TweetDbAPI {
     public Jedis jedis = new Jedis("localhost");
@@ -25,11 +23,15 @@ public class strategy1 implements TweetDbAPI {
         String tweet_id = UUID.randomUUID().toString();
         //create timestamp for tweet as it is inserted
         String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
-        //A STRING : key is tweet ts, tweet:id & value is a tweet text string
-        jedis.set("TS:"+timeStamp+"/"+"Tweet_id:" + tweet_id, "Tweet_text:" + tweet_text);
+        //A Hash : key is tweet ts, tweet:id & value is a tweet text, timestamp, and author user
+        Map<String, String> tweet = new HashMap<>();
+        tweet.put("Tweet_text", tweet_text);
+        tweet.put("TimeStamp", timeStamp);
+        tweet.put("User:", String.valueOf(user_id));
+        jedis.hmset("Tweet_id:"+tweet_id, tweet);
         //A LIST : key is user/tweet:id (just the user id)
         // values are tweet ts, tweet_id (id of tweets that user/tweet:id created)
-        jedis.lpush("User/Tweet:" + user_id, "TS:"+timeStamp+"/"+"Tweet_id:" + tweet_id);
+        jedis.lpush("User/Tweet:" + user_id, "Tweet_id:" + tweet_id);
     }
 
     public void home_screen(int user_id) {
@@ -47,11 +49,10 @@ public class strategy1 implements TweetDbAPI {
             // (this user is a person that the parameter user follows)
             System.out.println("TimeLine for :" + user_id);
             List<String> t_id = jedis.lrange("User/Tweet:" + result.get(i), 0, 11);
-            System.out.println("Author: "+ result.get(i));
 
             for (int t=0;  t < t_id.size(); t++) {
                 // print out tweets for the timeline
-                String text = jedis.get(t_id.get(t));
+                List<String> text = jedis.hmget(t_id.get(t), "Tweet_text", "TimeStamp", "User:");
                 System.out.println(text);
             }
         }

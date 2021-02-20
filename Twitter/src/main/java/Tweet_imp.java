@@ -85,10 +85,7 @@ public class Tweet_imp {
             long startTime = System.nanoTime();
             Random r = new Random();
             int user_id;
-////////////////////////////////////////////////////////////////////////CHANGE BACK TO 100///
-////////////////////////////////////////////////////////////////////////CHANGE user_id///
             for (int i=0; i < 100; i++){
-                //user_id = 35196;
                 user_id =  (r.nextInt(99999) + 1);
                 api.home_screen(user_id);
             }
